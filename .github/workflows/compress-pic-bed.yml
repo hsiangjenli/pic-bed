@@ -1,0 +1,32 @@
+name: Compress Pic-Bed Commits
+
+on:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: "0 0 * * 0"
+
+jobs:
+  squash_commits:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Squash all commits into one
+        run: |
+          git reset $(git commit-tree HEAD^{tree} -m "Squashed all commits")
+          git push origin main --force
+
+      - name: Success Message
+        run: echo "Successfully squashed all commits in pic-bed branch!"
